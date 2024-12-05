@@ -1,0 +1,47 @@
+version: '3'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq3
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    networks:
+      - messaging-network
+
+  order-service:
+    build: ./order-service
+    networks:
+      - messaging-network
+    environment:
+      - RABBITMQ_URL=amqp://user:password@rabbitmq
+
+  notification-service-almaty:
+    build: ./notification-service
+    networks:
+      - messaging-network
+    environment:
+      - REGION=almaty
+      - RABBITMQ_URL=amqp://user:password@rabbitmq
+
+  notification-service-astana:
+    build: ./notification-service
+    networks:
+      - messaging-network
+    environment:
+      - REGION=astana
+      - RABBITMQ_URL=amqp://user:password@rabbitmq
+
+  notification-service-all:
+    build: ./notification-service
+    networks:
+      - messaging-network
+    environment:
+      - REGION=all
+      - RABBITMQ_URL=amqp://user:password@rabbitmq
+
+networks:
+  messaging-network:
